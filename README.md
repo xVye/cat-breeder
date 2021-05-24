@@ -1,2 +1,2 @@
-# Example
-An example greeter plugin
+# Cat Breeder ![logo](icon.png)
+#### Detailed information for raising kittens
