@@ -88,7 +88,8 @@ public class CatBreederPlugin extends Plugin
 			return;
 		}
 
-		switch (gameStateChanged.getGameState()) {
+		switch (gameStateChanged.getGameState())
+		{
 			case LOGGED_IN:
 				kitten.updateActiveState();
 				break;

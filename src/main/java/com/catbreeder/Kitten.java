@@ -53,4 +53,9 @@ public class Kitten
             }
         }
     }
+
+    public long getTimeRemaining()
+    {
+        return 0;
+    }
 }
