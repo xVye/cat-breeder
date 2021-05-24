@@ -1,13 +1,13 @@
-package net.pixxie;
+package com.catbreeder;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-public class ExamplePluginTest
+public class CatBreederPluginTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		ExternalPluginManager.loadBuiltin(ExamplePlugin.class);
+		ExternalPluginManager.loadBuiltin(CatBreederPlugin.class);
 		RuneLite.main(args);
 	}
 }
