@@ -2,10 +2,7 @@ package com.catbreeder;
 
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
-import net.runelite.api.NPC;
 import net.runelite.api.Player;
-
-import java.util.Objects;
 
 public class Kitten
 {
@@ -37,21 +34,6 @@ public class Kitten
         this.owner = owner;
         this.actor = actor;
         isActive = active;
-    }
-
-    public void updateActiveState()
-    {
-        Player localPlayer = client.getLocalPlayer();
-        setActive(false);
-
-        for (NPC npc : client.getNpcs())
-        {
-            if (npc.getInteracting().equals(localPlayer) && Objects.requireNonNull(npc.getName()).contains("Kitten"))
-            {
-                setActive(true, localPlayer, npc);
-                break;
-            }
-        }
     }
 
     public long getTimeRemaining()

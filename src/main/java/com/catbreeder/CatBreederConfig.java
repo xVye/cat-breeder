@@ -8,7 +8,7 @@ import net.runelite.client.config.ConfigItem;
 public interface CatBreederConfig extends Config
 {
 	@ConfigItem(
-		keyName = "cat_timer",
+		keyName = "catShowTimer",
 		name = "Display grow-up timer",
 		description = "Toggle to show the grow-up timer"
 	)
