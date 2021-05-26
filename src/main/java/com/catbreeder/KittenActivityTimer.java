@@ -11,13 +11,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class CatTimer extends Timer
+public class KittenActivityTimer extends Timer
 {
     @Getter
     @Setter
     private boolean visible;
 
-    public CatTimer(Duration duration, BufferedImage image, Plugin plugin, boolean visible)
+    public KittenActivityTimer(Duration duration, BufferedImage image, Plugin plugin, boolean visible)
     {
         super(duration.toMillis(), ChronoUnit.MILLIS, image, plugin);
         setTooltip("Time until kitten needs attention or food");
@@ -29,11 +29,11 @@ public class CatTimer extends Timer
     {
         Duration timeLeft = Duration.between(Instant.now(), getEndTime());
 
-        if (timeLeft.getSeconds() < 60)
+        if (timeLeft.getSeconds() < Kitten.ATTENTION_WARN_TIME)
         {
+            // TODO: Send notification if enabled
             return Color.RED.brighter();
         }
-
         return Color.WHITE;
     }
 

@@ -31,7 +31,7 @@ public class CatBreederOverlay extends OverlayPanel
     @Override
     public Dimension render(Graphics2D graphics)
     {
-        CatTimer timer = plugin.getCurrentTimer();
+        KittenActivityTimer timer = plugin.getCurrentTimer();
         if (!plugin.getConfig().displayTimer() || timer == null || Instant.now().compareTo(timer.getEndTime()) < 0)
         {
             return null;
