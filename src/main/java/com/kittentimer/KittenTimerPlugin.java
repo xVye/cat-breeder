@@ -206,22 +206,26 @@ public class KittenTimerPlugin extends Plugin
 			String dialogText = Text.removeTags(playerDialog.getText());
 			switch (dialogText)
 			{
-				case Kitten.CHAT_NEW_KITTEN:
+				case KittenMessage.CHAT_NEW_KITTEN:
+				case KittenMessage.CHAT_HUNGRY:
 					// TODO: Set up new kitten stuff
 					resetTimer(Kitten.HUNGER_TIME);
 					break;
-				case Kitten.CHAT_ATTENTION:
+				case KittenMessage.CHAT_STROKE:
 					// TODO: Check when last interaction was for additional time
+					break;
+				case KittenMessage.CHAT_ATTENTION:
 					resetTimer(Kitten.ATTENTION_TIME_DEFAULT);
-				case Kitten.CHAT_HUNGRY:
-					resetTimer(Kitten.HUNGER_TIME);
-				case Kitten.CHAT_REALLY_HUNGRY:
+					break;
+				case KittenMessage.CHAT_REALLY_HUNGRY:
 					// TODO: Send notification
 					resetTimer(Kitten.HUNGER_WARN_TIME);
 					break;
-				case Kitten.CHAT_GROWN_UP:
+				case KittenMessage.CHAT_GROWN_UP:
 					// TODO: Send notification
 					resetTimer(-1);
+					break;
+				default:
 					break;
 			}
 		}
@@ -232,19 +236,19 @@ public class KittenTimerPlugin extends Plugin
 	{
 		switch (event.getMessage())
 		{
-			case Kitten.GAME_FEED_MESSAGE:
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + Kitten.GAME_FEED_MESSAGE, null);
+			case KittenMessage.GAME_FEED:
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + KittenMessage.GAME_FEED, null);
 				resetTimer(Kitten.HUNGER_TIME);
 				break;
-			case Kitten.GAME_STROKE_MESSAGE:
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + Kitten.GAME_STROKE_MESSAGE, null);
+			case KittenMessage.GAME_STROKE:
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + KittenMessage.GAME_STROKE, null);
 				resetTimer(Kitten.ATTENTION_STROKE_TIME);
 				break;
-			case Kitten.GAME_ATTENTION_MESSAGE:
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + Kitten.GAME_ATTENTION_MESSAGE, null);
+			case KittenMessage.GAME_ATTENTION:
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + KittenMessage.GAME_ATTENTION, null);
 				// TODO: Send notification
 				break;
-			case Kitten.NPC_EXAMINE:
+			case KittenMessage.NPC_EXAMINE:
 				event.getMessageNode().setRuneLiteFormatMessage("A friendly little pet. (Your kitten will grow up in: 20:00:00)");
 				chatMessageManager.update(event.getMessageNode());
 				// TODO: Update time left

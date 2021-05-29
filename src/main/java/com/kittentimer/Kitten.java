@@ -72,17 +72,6 @@ public class Kitten
         }
     }
 
-    public static final String GAME_FEED_MESSAGE = "The kitten gobbles up the fish.";
-    public static final String GAME_STROKE_MESSAGE = "You softly stroke your cat.";
-    public static final String GAME_ATTENTION_MESSAGE = "Your kitten wants attention.";
-    public static final String NPC_EXAMINE = "A friendly little pet.";
-    public static final String CHAT_NEW_KITTEN = "Gertrude gives you another kitten.";
-    public static final String CHAT_HUNGRY = "I think it's hungry!";
-    public static final String CHAT_ATTENTION = "I think it wants some attention.";
-    public static final String CHAT_REALLY_HUNGRY = "I think it's really hungry!";
-    public static final String CHAT_STROKE = "That cat sure loves to be stroked.";
-    public static final String CHAT_GROWN_UP = "Your kitten has grown into a healthy cat that can hunt for itself.";
-
     public static final int HUNGER_TIME = 1440;
     public static final int HUNGER_WARN_TIME = 180;
     public static final int ATTENTION_TIME_DEFAULT = 1500;
