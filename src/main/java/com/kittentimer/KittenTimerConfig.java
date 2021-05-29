@@ -1,20 +1,30 @@
-package com.catbreeder;
+package com.kittentimer;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup("catBreeder")
-public interface CatBreederConfig extends Config
+public interface KittenTimerConfig extends Config
 {
 	@ConfigItem(
-			keyName = "catShowTimer",
+			keyName = "catShowInteractionTimer",
+			name = "Display interaction timer",
+			description = "Toggle to show the interaction timer"
+	)
+	default boolean displayInteractionTimer()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "catShowGrowUpTimer",
 			name = "Display grow-up timer",
 			description = "Toggle to show the grow-up timer"
 	)
-	default boolean displayTimer()
+	default	boolean displayGrowUpTimer()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(

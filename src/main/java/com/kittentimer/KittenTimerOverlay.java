@@ -1,4 +1,4 @@
-package com.catbreeder;
+package com.kittentimer;
 
 import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -10,14 +10,14 @@ import javax.inject.Inject;
 import java.awt.*;
 import java.time.Instant;
 
-public class CatBreederOverlay extends OverlayPanel
+public class KittenTimerOverlay extends OverlayPanel
 {
     private final Client client;
-    private final CatBreederConfig config;
-    private final CatBreederPlugin plugin;
+    private final KittenTimerConfig config;
+    private final KittenTimerPlugin plugin;
 
     @Inject
-    public CatBreederOverlay(Client client, CatBreederConfig config, CatBreederPlugin plugin)
+    public KittenTimerOverlay(Client client, KittenTimerConfig config, KittenTimerPlugin plugin)
     {
         this.client = client;
         this.config = config;
@@ -32,7 +32,7 @@ public class CatBreederOverlay extends OverlayPanel
     public Dimension render(Graphics2D graphics)
     {
         KittenActivityTimer timer = plugin.getCurrentTimer();
-        if (!plugin.getConfig().displayTimer() || timer == null || Instant.now().compareTo(timer.getEndTime()) < 0)
+        if (!plugin.getConfig().displayInteractionTimer() || timer == null || Instant.now().compareTo(timer.getEndTime()) < 0)
         {
             return null;
         }

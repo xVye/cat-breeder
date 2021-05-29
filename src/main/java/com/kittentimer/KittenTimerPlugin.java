@@ -1,4 +1,4 @@
-package com.catbreeder;
+package com.kittentimer;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -31,11 +31,11 @@ import java.util.Objects;
 
 @Slf4j
 @PluginDescriptor(
-		name = "Cat Breeder",
+		name = "Kitten Timer",
 		description = "Detailed information for raising kittens",
 		tags = { "kitten", "cat", "breeding", "raising", "timer" }
 )
-public class CatBreederPlugin extends Plugin
+public class KittenTimerPlugin extends Plugin
 {
 	@Inject
 	private Notifier notifier;
@@ -59,7 +59,7 @@ public class CatBreederPlugin extends Plugin
 	private Client client;
 
 	@Inject
-	private CatBreederConfig config;
+	private KittenTimerConfig config;
 
 	@Getter
 	private boolean active;
@@ -73,9 +73,9 @@ public class CatBreederPlugin extends Plugin
 	private Kitten currentKitten;
 
 	@Provides
-	CatBreederConfig provideConfig(ConfigManager configManager)
+	KittenTimerConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(CatBreederConfig.class);
+		return configManager.getConfig(KittenTimerConfig.class);
 	}
 
 	@Override
@@ -120,27 +120,34 @@ public class CatBreederPlugin extends Plugin
 		configManager.setConfiguration("catBreeder", profileKey, "kitten", gson.toJson(currentKitten));
 	}
 
+	private void createTimer(Duration duration)
+	{
+		removeTimer();
+		BufferedImage image = itemManager.getImage(ItemID.PET_KITTEN);
+		currentTimer = new KittenActivityTimer(duration, image, this, active && config.displayInteractionTimer());
+		infoBoxManager.addInfoBox(currentTimer);
+		currentTimer.setVisible(active && config.displayInteractionTimer());
+	}
+
 	private void removeTimer()
 	{
 		infoBoxManager.removeInfoBox(currentTimer);
 		currentTimer = null;
 	}
 
-	private void createTimer(Duration duration)
-	{
-		removeTimer();
-		BufferedImage image = itemManager.getImage(ItemID.PET_KITTEN);
-		currentTimer = new KittenActivityTimer(duration, image, this, active && config.displayTimer());
-		infoBoxManager.addInfoBox(currentTimer);
-		currentTimer.setVisible(active && config.displayTimer());
-	}
-
 	private void resetTimer(long seconds)
 	{
+		if (seconds == -1)
+		{
+			removeTimer();
+			return;
+		}
+
 		if (Instant.now().compareTo(currentTimer.getEndTime()) > seconds)
 		{
 			return;
 		}
+
 		createTimer(Duration.ofSeconds(seconds));
 		log.info("Resetting timer.");
 	}
@@ -155,7 +162,7 @@ public class CatBreederPlugin extends Plugin
 	{
 		if (currentTimer != null)
 		{
-			currentTimer.setVisible(active && config.displayTimer());
+			currentTimer.setVisible(active && config.displayInteractionTimer());
 		}
 	}
 
@@ -199,11 +206,22 @@ public class CatBreederPlugin extends Plugin
 			String dialogText = Text.removeTags(playerDialog.getText());
 			switch (dialogText)
 			{
-				case Kitten.GAME_STROKE_MESSAGE:
-					resetTimer(Kitten.ATTENTION_STROKE_TIME);
+				case Kitten.CHAT_NEW_KITTEN:
+					// TODO: Set up new kitten stuff
+					resetTimer(Kitten.HUNGER_TIME);
 					break;
-				case Kitten.GAME_FEED_MESSAGE:
+				case Kitten.CHAT_ATTENTION:
+					// TODO: Check when last interaction was for additional time
 					resetTimer(Kitten.ATTENTION_TIME_DEFAULT);
+				case Kitten.CHAT_HUNGRY:
+					resetTimer(Kitten.HUNGER_TIME);
+				case Kitten.CHAT_REALLY_HUNGRY:
+					// TODO: Send notification
+					resetTimer(Kitten.HUNGER_WARN_TIME);
+					break;
+				case Kitten.CHAT_GROWN_UP:
+					// TODO: Send notification
+					resetTimer(-1);
 					break;
 			}
 		}
@@ -215,15 +233,15 @@ public class CatBreederPlugin extends Plugin
 		switch (event.getMessage())
 		{
 			case Kitten.GAME_FEED_MESSAGE:
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Cat Breeder: " + Kitten.GAME_FEED_MESSAGE, null);
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + Kitten.GAME_FEED_MESSAGE, null);
 				resetTimer(Kitten.HUNGER_TIME);
 				break;
 			case Kitten.GAME_STROKE_MESSAGE:
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Cat Breeder: " + Kitten.GAME_STROKE_MESSAGE, null);
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + Kitten.GAME_STROKE_MESSAGE, null);
 				resetTimer(Kitten.ATTENTION_STROKE_TIME);
 				break;
 			case Kitten.GAME_ATTENTION_MESSAGE:
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Cat Breeder: " + Kitten.GAME_ATTENTION_MESSAGE, null);
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Kitten Timer: " + Kitten.GAME_ATTENTION_MESSAGE, null);
 				// TODO: Send notification
 				break;
 			case Kitten.NPC_EXAMINE:
@@ -317,7 +335,7 @@ public class CatBreederPlugin extends Plugin
 		String key = event.getKey();
 		if ("catShowTimer".equals(key) && currentTimer != null)
 		{
-			currentTimer.setVisible(active && config.displayTimer());
+			currentTimer.setVisible(active && config.displayInteractionTimer());
 		}
 		recheckActive();
 	}
@@ -343,7 +361,7 @@ public class CatBreederPlugin extends Plugin
 		return key.toString();
 	}
 
-	public CatBreederConfig getConfig()
+	public KittenTimerConfig getConfig()
 	{
 		return config;
 	}

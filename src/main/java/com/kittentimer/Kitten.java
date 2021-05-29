@@ -1,10 +1,9 @@
-package com.catbreeder;
+package com.kittentimer;
 
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.util.ImageUtil;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -77,6 +76,12 @@ public class Kitten
     public static final String GAME_STROKE_MESSAGE = "You softly stroke your cat.";
     public static final String GAME_ATTENTION_MESSAGE = "Your kitten wants attention.";
     public static final String NPC_EXAMINE = "A friendly little pet.";
+    public static final String CHAT_NEW_KITTEN = "Gertrude gives you another kitten.";
+    public static final String CHAT_HUNGRY = "I think it's hungry!";
+    public static final String CHAT_ATTENTION = "I think it wants some attention.";
+    public static final String CHAT_REALLY_HUNGRY = "I think it's really hungry!";
+    public static final String CHAT_STROKE = "That cat sure loves to be stroked.";
+    public static final String CHAT_GROWN_UP = "Your kitten has grown into a healthy cat that can hunt for itself.";
 
     public static final int HUNGER_TIME = 1440;
     public static final int HUNGER_WARN_TIME = 180;
@@ -96,9 +101,9 @@ public class Kitten
     private ItemManager itemManager;
 
     private final Client client;
-    private final CatBreederPlugin plugin;
+    private final KittenTimerPlugin plugin;
 
-    public Kitten(Client client, CatBreederPlugin plugin)
+    public Kitten(Client client, KittenTimerPlugin plugin)
     {
         this.client = client;
         this.plugin = plugin;
@@ -123,7 +128,7 @@ public class Kitten
 
     private void createTimer(Duration duration)
     {
-        growthTimer = new KittenGrowthTimer(duration, itemManager.getImage(kittenID.itemSpriteId), plugin);
+        growthTimer = new KittenGrowthTimer(duration, itemManager.getImage(kittenID.itemSpriteId), plugin, isActive && plugin.getConfig().displayGrowUpTimer());
     }
 
     public KittenID getId()

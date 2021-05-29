@@ -1,4 +1,4 @@
-package com.catbreeder;
+package com.kittentimer;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,7 @@ public class KittenActivityTimer extends Timer
     public KittenActivityTimer(Duration duration, BufferedImage image, Plugin plugin, boolean visible)
     {
         super(duration.toMillis(), ChronoUnit.MILLIS, image, plugin);
-        setTooltip("Time until kitten needs attention or food");
+        setTooltip("Time until your kitten needs attention or food");
         this.visible = visible;
     }
 

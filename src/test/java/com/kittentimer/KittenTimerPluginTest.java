@@ -1,13 +1,13 @@
-package com.catbreeder;
+package com.kittentimer;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-public class CatBreederPluginTest
+public class KittenTimerPluginTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		ExternalPluginManager.loadBuiltin(CatBreederPlugin.class);
+		ExternalPluginManager.loadBuiltin(KittenTimerPlugin.class);
 		RuneLite.main(args);
 	}
 }

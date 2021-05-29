@@ -1,2 +1,2 @@
-# Cat Breeder ![logo](icon.png)
+# Kitten Timer ![logo](icon.png)
 #### Detailed information for raising kittens
