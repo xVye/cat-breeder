@@ -39,7 +39,6 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.ItemID;
 import net.runelite.api.NPC;
-import net.runelite.api.Varbits;
 import net.runelite.api.WorldType;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
@@ -103,7 +102,7 @@ public class KittenTimerPlugin extends Plugin
 	private boolean active;
 
 	@Getter
-	private KittenActivityTimer currentTimer;
+	private KittenAttentionTimer currentTimer;
 
 	private final Gson gson = new Gson();
 	private ItemContainer lastItemContainer;
@@ -164,7 +163,7 @@ public class KittenTimerPlugin extends Plugin
 	{
 		removeTimer();
 		BufferedImage image = itemManager.getImage(ItemID.PET_KITTEN);
-		currentTimer = new KittenActivityTimer(duration, image, this, active && config.displayInteractionTimer());
+		currentTimer = new KittenAttentionTimer(duration, image, this, active && config.displayInteractionTimer());
 		infoBoxManager.addInfoBox(currentTimer);
 		currentTimer.setVisible(active && config.displayInteractionTimer());
 	}

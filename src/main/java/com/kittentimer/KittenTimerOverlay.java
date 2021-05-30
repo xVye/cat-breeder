@@ -56,7 +56,7 @@ public class KittenTimerOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		KittenActivityTimer timer = plugin.getCurrentTimer();
+		KittenAttentionTimer timer = plugin.getCurrentTimer();
 		if (!plugin.getConfig().displayInteractionTimer() || timer == null || Instant.now().compareTo(timer.getEndTime()) < 0)
 		{
 			return null;
