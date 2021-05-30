@@ -184,11 +184,11 @@ public class KittenTimerPlugin extends Plugin
 	@Subscribe
 	public void onWidgetClosed(WidgetClosed event)
 	{
-		if (event.getGroupId() != WidgetInfo.DIALOG_PLAYER.getGroupId())
+		int groupId = event.getGroupId();
+		if (groupId == WidgetInfo.DIALOG_PLAYER.getGroupId() || groupId == 229)
 		{
-			return;
+			canNotify = true;
 		}
-		canNotify = true;
 	}
 
 	@Subscribe
