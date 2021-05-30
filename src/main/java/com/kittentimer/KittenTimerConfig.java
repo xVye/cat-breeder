@@ -32,42 +32,12 @@ import net.runelite.client.config.ConfigItem;
 public interface KittenTimerConfig extends Config
 {
 	@ConfigItem(
-		keyName = "catShowOverlaySymbol",
-		name = "Display world overlay symbols",
-		description = "Toggle to show world overlay symbols"
+		keyName = "kittenDisplayInteractionTimer",
+		name = "Display interaction timer",
+		description = "Toggle to show the interaction timer"
 	)
-	default boolean displayOverlaySymbol()
+	default boolean displayInteractionTimer()
 	{
 		return true;
-	}
-
-	@ConfigItem(
-		keyName = "catShowAttentionTimer",
-		name = "Display attention timer",
-		description = "Toggle to show the attention timer"
-	)
-	default boolean displayAttentionTimer()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "catShowGrowUpTimer",
-		name = "Display grow-up timer",
-		description = "Toggle to show the grow-up timer"
-	)
-	default boolean displayGrowUpTimer()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		keyName = "catShowNotifications",
-		name = "Enable notifications",
-		description = "Toggle to recieve notifications"
-	)
-	default boolean displayNotifications()
-	{
-		return false;
 	}
 }

@@ -31,6 +31,7 @@ public abstract class KittenMessage
 	 */
 	public static final String CHAT_NEW_KITTEN = "Gertrude gives you another kitten.";
 	public static final String CHAT_STROKE = "That cat sure loves to be stroked.";
+	public static final String CHAT_BALL_OF_WOOL = "That kitten loves to play with that ball of wool. I think itis its favourite.";
 	public static final String CHAT_HUNGRY = "I think it's hungry!";
 	public static final String CHAT_REALLY_HUNGRY = "I think it's really hungry!";
 	public static final String CHAT_ATTENTION = "I think it wants some attention.";
@@ -40,8 +41,12 @@ public abstract class KittenMessage
 	 * Game messages.
 	 */
 	public static final String GAME_FEED = "The kitten gobbles up the fish.";
-	public static final String GAME_ATTENTION = "Your kitten wants attention.";
 	public static final String GAME_STROKE = "You softly stroke your cat.";
+	public static final String GAME_HUNGRY = "Your kitten is hungry.";
+	public static final String GAME_REALLY_HUNGRY = "Your kitten is very hungry.";
+	public static final String GAME_ATTENTION = "Your kitten wants attention.";
+	public static final String GAME_ATTENTION_SECOND = "Your kitten really wants attention.";
+	public static final String GAME_RUN_AWAY = "The cat has run away.";
 
 	/**
 	 * Examine.
