@@ -35,16 +35,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class KittenActivityTimer extends Timer
+public class KittenAttentionTimer extends Timer
 {
 	@Getter
 	@Setter
 	private boolean visible;
 
-	public KittenActivityTimer(Duration duration, BufferedImage image, Plugin plugin, boolean visible)
+	public KittenAttentionTimer(Duration duration, BufferedImage image, Plugin plugin, boolean visible)
 	{
 		super(duration.toMillis(), ChronoUnit.MILLIS, image, plugin);
-		setTooltip("Time until your kitten needs attention or food");
+		setTooltip("Time until your kitten needs attention");
 		this.visible = visible;
 	}
 
