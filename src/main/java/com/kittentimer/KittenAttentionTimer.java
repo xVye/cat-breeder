@@ -29,8 +29,8 @@ import lombok.Setter;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.ui.overlay.infobox.Timer;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.Color;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

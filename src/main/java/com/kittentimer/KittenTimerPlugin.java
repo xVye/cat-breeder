@@ -27,7 +27,9 @@ package com.kittentimer;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -59,6 +61,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+import net.runelite.client.ui.overlay.infobox.Timer;
 import net.runelite.client.util.Text;
 
 import java.awt.image.BufferedImage;
@@ -104,10 +107,13 @@ public class KittenTimerPlugin extends Plugin
 	@Getter
 	private KittenAttentionTimer currentTimer;
 
+	@Getter
+	private Kitten currentKitten;
+
 	private final Gson gson = new Gson();
+	private final List<Timer> activityTimers = new ArrayList<>();
 	private ItemContainer lastItemContainer;
 	private String profileKey;
-	private Kitten currentKitten;
 
 	@Provides
 	KittenTimerConfig provideConfig(ConfigManager configManager)
@@ -118,7 +124,6 @@ public class KittenTimerPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		currentKitten = new Kitten(client, this);
 		profileKey = getProfileKey();
 		//loadConfig();
 		recheckActive();
@@ -128,7 +133,7 @@ public class KittenTimerPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		//saveConfig();
-		removeTimer();
+		removeTimers();
 		currentTimer = null;
 		active = false;
 	}
@@ -161,28 +166,79 @@ public class KittenTimerPlugin extends Plugin
 
 	private void createTimer(Duration duration)
 	{
-		removeTimer();
+		boolean followerActive = client.getVarpValue(KittenVarPlayer.FOLLOWER.getId()) != -1;
+		if (!followerActive)
+		{
+			return;
+		}
+
+		removeTimers();
 		BufferedImage image = itemManager.getImage(ItemID.PET_KITTEN);
-		currentTimer = new KittenAttentionTimer(duration, image, this, active && config.displayInteractionTimer());
+		currentTimer = new KittenAttentionTimer(duration, image, this, active && config.displayAttentionTimer());
 		infoBoxManager.addInfoBox(currentTimer);
-		currentTimer.setVisible(active && config.displayInteractionTimer());
+		currentTimer.setVisible(active && config.displayAttentionTimer());
 	}
 
-	private void removeTimer()
+	private void createTimers()
+	{
+		createTimers(ItemID.PET_KITTEN);
+	}
+
+	private void createTimers(int iconID)
+	{
+		removeTimers();
+
+		boolean followerActive = client.getVarpValue(KittenVarPlayer.FOLLOWER.getId()) != -1;
+		if (!followerActive)
+		{
+			return;
+		}
+
+		BufferedImage image = itemManager.getImage(iconID);
+		currentTimer = new KittenAttentionTimer(Duration.ofSeconds(-1), image, this, active && config.displayAttentionTimer());
+		currentTimer = new KittenAttentionTimer(Duration.ofSeconds(-1), image, this, active && config.displayAttentionTimer());
+		currentTimer = new KittenAttentionTimer(Duration.ofSeconds(-1), image, this, active && config.displayAttentionTimer());
+
+		infoBoxManager.addInfoBox(currentTimer);
+		infoBoxManager.addInfoBox(currentTimer);
+		infoBoxManager.addInfoBox(currentTimer);
+
+		activityTimers.add(currentTimer);
+		activityTimers.add(currentTimer);
+		activityTimers.add(currentTimer);
+	}
+
+	private void removeTimers()
 	{
 		infoBoxManager.removeInfoBox(currentTimer);
+
+		for (Timer timer : activityTimers)
+		{
+			if (timer == null)
+			{
+				continue;
+			}
+			infoBoxManager.removeInfoBox(timer);
+		}
+
+		activityTimers.clear();
 		currentTimer = null;
 	}
 
 	private void resetTimer(long seconds)
 	{
-		if (seconds == -1)
+		if (currentTimer == null)
 		{
-			removeTimer();
 			return;
 		}
 
-		if (Instant.now().compareTo(Objects.requireNonNull(currentTimer.getEndTime())) > seconds)
+		if (seconds == -1)
+		{
+			removeTimers();
+			return;
+		}
+
+		if (Instant.now().compareTo(currentTimer.getEndTime()) > seconds)
 		{
 			return;
 		}
@@ -201,7 +257,7 @@ public class KittenTimerPlugin extends Plugin
 	{
 		if (currentTimer != null)
 		{
-			currentTimer.setVisible(active && config.displayInteractionTimer());
+			currentTimer.setVisible(active && config.displayAttentionTimer());
 		}
 	}
 
@@ -219,6 +275,7 @@ public class KittenTimerPlugin extends Plugin
 			if (isNpcMatch(npc))
 			{
 				log.info("Found cat, enabling timer.");
+				currentKitten = currentKitten == null ? new Kitten(client, this, npc.getWorldLocation()) : currentKitten;
 				foundKitten = true;
 				break;
 			}
@@ -378,7 +435,7 @@ public class KittenTimerPlugin extends Plugin
 		String key = event.getKey();
 		if ("catShowTimer".equals(key) && currentTimer != null)
 		{
-			currentTimer.setVisible(active && config.displayInteractionTimer());
+			currentTimer.setVisible(active && config.displayAttentionTimer());
 		}
 		recheckActive();
 	}

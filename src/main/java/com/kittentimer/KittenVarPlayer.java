@@ -24,50 +24,17 @@
  */
 package com.kittentimer;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@ConfigGroup("kittenTimer")
-public interface KittenTimerConfig extends Config
+@AllArgsConstructor
+@Getter
+public enum KittenVarPlayer
 {
-	@ConfigItem(
-		keyName = "catShowOverlaySymbol",
-		name = "Display world overlay symbols",
-		description = "Toggle to show world overlay symbols"
-	)
-	default boolean displayOverlaySymbol()
-	{
-		return true;
-	}
+	/**
+	 * No follower: -1
+	 */
+	FOLLOWER(447);
 
-	@ConfigItem(
-		keyName = "catShowAttentionTimer",
-		name = "Display attention timer",
-		description = "Toggle to show the attention timer"
-	)
-	default boolean displayAttentionTimer()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "catShowGrowUpTimer",
-		name = "Display grow-up timer",
-		description = "Toggle to show the grow-up timer"
-	)
-	default boolean displayGrowUpTimer()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		keyName = "catShowNotifications",
-		name = "Enable notifications",
-		description = "Toggle to recieve notifications"
-	)
-	default boolean displayNotifications()
-	{
-		return false;
-	}
+	private final int id;
 }

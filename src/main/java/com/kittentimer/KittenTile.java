@@ -24,44 +24,26 @@
  */
 package com.kittentimer;
 
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import net.runelite.api.Client;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPanel;
-import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
+import lombok.Getter;
+import net.runelite.api.ItemID;
+import net.runelite.api.coords.WorldPoint;
 
-import javax.inject.Inject;
-import java.time.Instant;
-
-public class KittenTimerOverlay extends OverlayPanel
+public class KittenTile
 {
-	private final Client client;
-	private final KittenTimerConfig config;
-	private final KittenTimerPlugin plugin;
+	@Getter
+	private final WorldPoint worldPoint;
+	@Getter
+	private final int iconID;
 
-	@Inject
-	public KittenTimerOverlay(Client client, KittenTimerConfig config, KittenTimerPlugin plugin)
+	public KittenTile(WorldPoint worldPoint)
 	{
-		this.client = client;
-		this.config = config;
-		this.plugin = plugin;
-
-		setLayer(OverlayLayer.ALWAYS_ON_TOP);
-		setPriority(OverlayPriority.HIGHEST);
-		setPosition(OverlayPosition.DYNAMIC);
+		this.worldPoint = worldPoint;
+		this.iconID = ItemID.PET_KITTEN;
 	}
 
-	@Override
-	public Dimension render(Graphics2D graphics)
+	public KittenTile(WorldPoint worldPoint, int iconID)
 	{
-		KittenAttentionTimer timer = plugin.getCurrentTimer();
-		if (!plugin.getConfig().displayInteractionTimer() || timer == null || Instant.now().compareTo(timer.getEndTime()) < 0)
-		{
-			return null;
-		}
-
-		return super.render(graphics);
+		this.worldPoint = worldPoint;
+		this.iconID = iconID;
 	}
 }

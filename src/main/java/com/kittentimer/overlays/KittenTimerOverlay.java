@@ -22,19 +22,47 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.kittentimer;
+package com.kittentimer.overlays;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.kittentimer.KittenAttentionTimer;
+import com.kittentimer.KittenTimerConfig;
+import com.kittentimer.KittenTimerPlugin;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import net.runelite.api.Client;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPanel;
+import net.runelite.client.ui.overlay.OverlayPosition;
 
-@AllArgsConstructor
-@Getter
-public enum VarPlayer
+import javax.inject.Inject;
+import java.time.Instant;
+
+public class KittenTimerOverlay extends OverlayPanel
 {
-	/**
-	 * No follower: -1
-	 */
-	FOLLOWER(447);
+	private final Client client;
+	private final KittenTimerConfig config;
+	private final KittenTimerPlugin plugin;
 
-	private final int id;
+	@Inject
+	public KittenTimerOverlay(Client client, KittenTimerConfig config, KittenTimerPlugin plugin)
+	{
+		this.client = client;
+		this.config = config;
+		this.plugin = plugin;
+
+		setPosition(OverlayPosition.DYNAMIC);
+		setLayer(OverlayLayer.ABOVE_SCENE);
+	}
+
+	@Override
+	public Dimension render(Graphics2D graphics)
+	{
+		KittenAttentionTimer timer = plugin.getCurrentTimer();
+		if (!plugin.getConfig().displayAttentionTimer() || timer == null || Instant.now().compareTo(timer.getEndTime()) < 0)
+		{
+			return null;
+		}
+
+		return super.render(graphics);
+	}
 }
