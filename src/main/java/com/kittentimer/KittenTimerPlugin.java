@@ -3,12 +3,26 @@ package com.kittentimer;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
+import java.util.EnumSet;
 import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
-import net.runelite.api.events.*;
+import net.runelite.api.ChatMessageType;
+import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.ItemID;
+import net.runelite.api.NPC;
+import net.runelite.api.WorldType;
+import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.InteractingChanged;
+import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.WorldChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
@@ -26,14 +40,13 @@ import net.runelite.client.util.Text;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.EnumSet;
 import java.util.Objects;
 
 @Slf4j
 @PluginDescriptor(
-		name = "Kitten Timer",
-		description = "Detailed information for raising kittens",
-		tags = { "kitten", "cat", "breeding", "raising", "timer" }
+	name = "Kitten Timer",
+	description = "Detailed information for raising kittens",
+	tags = {"kitten", "cat", "breeding", "raising", "timer"}
 )
 public class KittenTimerPlugin extends Plugin
 {
@@ -98,12 +111,14 @@ public class KittenTimerPlugin extends Plugin
 
 	public void loadConfig()
 	{
-		configManager.unsetConfiguration("catBreeder", getProfileKey());
+		configManager.unsetConfiguration("kittenTimer", getProfileKey());
 		profileKey = configManager.getRSProfileKey();
 
 		Kitten kitten = gson.fromJson(
-				configManager.getRSProfileConfiguration("catBreeder", "kitten"),
-				new TypeToken<Kitten>(){}.getType());
+			configManager.getRSProfileConfiguration("kittenTimer", "kitten"),
+			new TypeToken<Kitten>()
+			{
+			}.getType());
 
 		if (kitten != null)
 		{
@@ -117,7 +132,7 @@ public class KittenTimerPlugin extends Plugin
 		{
 			return;
 		}
-		configManager.setConfiguration("catBreeder", profileKey, "kitten", gson.toJson(currentKitten));
+		configManager.setConfiguration("kittenTimer", profileKey, "kitten", gson.toJson(currentKitten));
 	}
 
 	private void createTimer(Duration duration)
@@ -143,7 +158,7 @@ public class KittenTimerPlugin extends Plugin
 			return;
 		}
 
-		if (Instant.now().compareTo(currentTimer.getEndTime()) > seconds)
+		if (Instant.now().compareTo(Objects.requireNonNull(currentTimer.getEndTime())) > seconds)
 		{
 			return;
 		}
