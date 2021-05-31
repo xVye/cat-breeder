@@ -107,23 +107,24 @@ public class KittenTimerPlugin extends Plugin
 		if (newKittenDialog != null)
 		{
 			String newKittenDialogText = Text.removeTags(newKittenDialog.getText()).trim();
-			if (newKittenDialogText.equals(KittenMessage.CHAT_NEW_KITTEN))
+			if (!newKittenDialogText.equals(KittenMessage.CHAT_NEW_KITTEN))
 			{
-				Player localPlayer = client.getLocalPlayer();
-				if (localPlayer == null)
-				{
-					return;
-				}
-
-				NPC npcInteracting = (NPC) localPlayer.getInteracting();
-				if (npcInteracting == null)
-				{
-					return;
-				}
-
-				currentKitten = new Kitten(client.getLocalPlayer(), npcInteracting, Instant.now());
 				return;
 			}
+			Player localPlayer = client.getLocalPlayer();
+			if (localPlayer == null)
+			{
+				return;
+			}
+
+			NPC npcInteracting = (NPC) localPlayer.getInteracting();
+			if (npcInteracting == null)
+			{
+				return;
+			}
+
+			currentKitten = new Kitten(client.getLocalPlayer(), npcInteracting, Instant.now());
+			return;
 		}
 
 		if (playerDialog == null)
