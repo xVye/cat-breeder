@@ -24,16 +24,19 @@
  */
 package com.kittentimer.utils;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 
+@Slf4j
 @AllArgsConstructor
 @Getter
 public enum KittenID
 {
-	DEFAULT_KITTEN(ItemID.FLUFFS_KITTEN, NpcID.KITTEN),
 	KITTEN_2(ItemID.PET_KITTEN, NpcID.KITTEN_5591),
 	KITTEN_3(ItemID.PET_KITTEN_1556, NpcID.KITTEN_5592),
 	KITTEN_4(ItemID.PET_KITTEN_1557, NpcID.KITTEN_5593),
@@ -42,30 +45,34 @@ public enum KittenID
 	KITTEN_7(ItemID.PET_KITTEN_1560, NpcID.KITTEN_5596),
 	HELLKITTEN(ItemID.HELLKITTEN, NpcID.HELLKITTEN);
 
+	private static final Map<Integer, Integer> kittens = new HashMap<>();
 	private final int iconId;
 	private final int id;
 
+	static
+	{
+		for (KittenID kittenID : values())
+		{
+			kittens.put(kittenID.getIconId(), kittenID.getId());
+		}
+	}
+
 	public static boolean contains(int npcId)
 	{
-		for (KittenID kittenID : KittenID.values())
-		{
-			if (kittenID.getId() == npcId)
-			{
-				return true;
-			}
-		}
-		return false;
+		return kittens.containsValue(npcId);
 	}
 
 	public static int getIconId(int npcId)
 	{
-		for (KittenID kittenID : KittenID.values())
+		for (Map.Entry<Integer, Integer> kittenID : kittens.entrySet())
 		{
-			if (kittenID.getId() == npcId)
+			if (kittenID.getValue().equals(npcId))
 			{
-				return kittenID.iconId;
+				log.info("KittenID.getIconId: NpcID(" + kittenID.getValue() + ") - IconID(" + kittenID.getKey() + ")");
+				return kittenID.getKey();
 			}
 		}
+		log.info("KittenID.getIconId: no match.");
 		return 0;
 	}
 }

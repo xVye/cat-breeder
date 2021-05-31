@@ -26,6 +26,7 @@ package com.kittentimer.overlays;
 
 import com.kittentimer.KittenTimerConfig;
 import com.kittentimer.KittenTimerPlugin;
+import com.kittentimer.followers.Kitten;
 import com.kittentimer.utils.KittenID;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -34,6 +35,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
@@ -44,6 +46,7 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
+@Slf4j
 public class KittenSceneOverlay extends Overlay
 {
 	private static final int ICON_OFFSET_Z = 32;
@@ -64,7 +67,11 @@ public class KittenSceneOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		renderNpcOverlay(graphics, plugin.getCurrentKitten().getNpc(), config.getHighlightColor());
+		Kitten kitten = plugin.getCurrentKitten();
+		if (kitten != null)
+		{
+			renderNpcOverlay(graphics, kitten.getNpc(), config.getHighlightColor());
+		}
 		return null;
 	}
 
@@ -115,10 +122,11 @@ public class KittenSceneOverlay extends Overlay
 		final int kittenIconId = KittenID.getIconId(plugin.getCurrentKitten().getId());
 		if (kittenIconId == 0)
 		{
+			log.info("KittenSceneOverlay.renderIcon: KittenID is 0!");
 			return;
 		}
 
 		final BufferedImage image = plugin.getItemManager().getImage(kittenIconId);
-		OverlayUtil.renderActorOverlayImage(graphics, npc, image, Color.RED.brighter(), ICON_OFFSET_Z);
+		OverlayUtil.renderActorOverlayImage(graphics, npc, image, Color.RED.brighter(), -ICON_OFFSET_Z);
 	}
 }

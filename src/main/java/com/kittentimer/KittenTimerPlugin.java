@@ -26,6 +26,7 @@ package com.kittentimer;
 
 import com.google.inject.Provides;
 import com.kittentimer.followers.Kitten;
+import com.kittentimer.overlays.KittenSceneOverlay;
 import com.kittentimer.utils.KittenID;
 import java.time.Instant;
 import java.util.Objects;
@@ -38,6 +39,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.events.WidgetLoaded;
@@ -71,6 +73,8 @@ public class KittenTimerPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
+	private KittenSceneOverlay kittenSceneOverlay;
+
 	@Inject
 	private Client client;
 
@@ -78,6 +82,7 @@ public class KittenTimerPlugin extends Plugin
 	private Kitten currentKitten;
 
 	private boolean canNotify;
+	private boolean newKitten;
 
 	@Provides
 	KittenTimerConfig provideConfig(ConfigManager configManager)
@@ -88,6 +93,8 @@ public class KittenTimerPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
+		kittenSceneOverlay = new KittenSceneOverlay(client, provideConfig(configManager), this);
+		overlayManager.add(kittenSceneOverlay); // TODO: Highlights Gertrude LOL! (Also no icon)
 		canNotify = true;
 		log.info(KittenTimerConfig.class.getName() + " startUp()");
 	}
@@ -95,6 +102,7 @@ public class KittenTimerPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
+		overlayManager.removeIf(t -> t instanceof KittenTimerConfig);
 		log.info(KittenTimerConfig.class.getName() + "shutDown()");
 	}
 
@@ -104,6 +112,30 @@ public class KittenTimerPlugin extends Plugin
 		Widget playerDialog = client.getWidget(WidgetInfo.DIALOG_PLAYER);
 		Widget newKittenDialog = client.getWidget(229, 1);
 
+		if (newKitten || currentKitten == null)
+		{
+			// TODO: Setup a new kitten
+			Player localPlayer = client.getLocalPlayer();
+			if (localPlayer == null)
+			{
+				return;
+			}
+
+			if (!hasFollower())
+			{
+				return;
+			}
+
+			NPC follower = getInteractingFollower();
+			if (follower == null)
+			{
+				return;
+			}
+
+			currentKitten = new Kitten(localPlayer, follower, Instant.now());
+			newKitten = false;
+		}
+
 		if (newKittenDialog != null)
 		{
 			String newKittenDialogText = Text.removeTags(newKittenDialog.getText()).trim();
@@ -112,19 +144,7 @@ public class KittenTimerPlugin extends Plugin
 				return;
 			}
 
-			Player localPlayer = client.getLocalPlayer();
-			if (localPlayer == null)
-			{
-				return;
-			}
-
-			NPC npcInteracting = (NPC) localPlayer.getInteracting();
-			if (npcInteracting == null)
-			{
-				return;
-			}
-
-			currentKitten = new Kitten(client.getLocalPlayer(), npcInteracting, Instant.now());
+			newKitten = true;
 			return;
 		}
 
@@ -191,13 +211,12 @@ public class KittenTimerPlugin extends Plugin
 			return;
 		}
 
-		int varKitten = client.getVarpValue(KittenVarPlayer.FOLLOWER.getId());
-		if (varKitten == -1)
+		if (!hasFollower())
 		{
 			return;
 		}
 
-		if (!verifyFollower())
+		if (getInteractingFollower() == null)
 		{
 			return;
 		}
@@ -220,7 +239,7 @@ public class KittenTimerPlugin extends Plugin
 				}
 				break;
 			case KittenMessage.NPC_EXAMINE:
-				if (!verifyFollower())
+				if (getInteractingFollower() == null)
 				{
 					currentKitten = null;
 				}
@@ -228,6 +247,23 @@ public class KittenTimerPlugin extends Plugin
 				break;
 			default:
 				break;
+		}
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged event)
+	{
+		if (event.getGameState() == GameState.LOGGED_IN)
+		{
+			if (currentKitten == null)
+			{
+				NPC npcInteracting = (NPC) client.getLocalPlayer().getInteracting();
+				if (npcInteracting == null)
+				{
+					return;
+				}
+				currentKitten = new Kitten(client.getLocalPlayer(), npcInteracting, Instant.now());
+			}
 		}
 	}
 
@@ -263,9 +299,24 @@ public class KittenTimerPlugin extends Plugin
 		}
 	}
 
-	private boolean verifyFollower()
+	private boolean hasFollower()
 	{
-		NPC npcKitten = (NPC) Objects.requireNonNull(client.getLocalPlayer()).getInteracting();
-		return KittenID.contains(npcKitten.getId());
+		int varFollower = client.getVarpValue(KittenVarPlayer.FOLLOWER.getId());
+		return varFollower != -1;
+	}
+
+	private NPC getInteractingFollower()
+	{
+		Player localPlayer = client.getLocalPlayer();
+		if (localPlayer == null)
+		{
+			return null;
+		}
+		NPC npcKitten = (NPC) localPlayer.getInteracting();
+		if (!KittenID.contains(npcKitten.getId()))
+		{
+			return null;
+		}
+		return npcKitten;
 	}
 }
