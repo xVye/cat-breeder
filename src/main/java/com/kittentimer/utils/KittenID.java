@@ -22,45 +22,50 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.kittentimer;
+package com.kittentimer.utils;
 
-import java.awt.Color;
-import net.runelite.client.config.Alpha;
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
 
-@ConfigGroup("kittenTimer")
-public interface KittenTimerConfig extends Config
+@AllArgsConstructor
+@Getter
+public enum KittenID
 {
-	@ConfigItem(
-		keyName = "kittenDisplayInteractionTimer",
-		name = "Display Interaction Timer",
-		description = "Toggle to show the interaction timer"
-	)
-	default boolean displayInteractionTimer()
+	DEFAULT_KITTEN(ItemID.FLUFFS_KITTEN, NpcID.KITTEN),
+	KITTEN_2(ItemID.PET_KITTEN, NpcID.KITTEN_5591),
+	KITTEN_3(ItemID.PET_KITTEN_1556, NpcID.KITTEN_5592),
+	KITTEN_4(ItemID.PET_KITTEN_1557, NpcID.KITTEN_5593),
+	KITTEN_5(ItemID.PET_KITTEN_1558, NpcID.KITTEN_5594),
+	KITTEN_6(ItemID.PET_KITTEN_1559, NpcID.KITTEN_5595),
+	KITTEN_7(ItemID.PET_KITTEN_1560, NpcID.KITTEN_5596),
+	HELLKITTEN(ItemID.HELLKITTEN, NpcID.HELLKITTEN);
+
+	private final int iconId;
+	private final int id;
+
+	public static boolean contains(int npcId)
 	{
-		return true;
+		for (KittenID kittenID : KittenID.values())
+		{
+			if (kittenID.getId() == npcId)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
-	@ConfigItem(
-		keyName = "kittenHighlightTile",
-		name = "Highlight Kitten Tile",
-		description = "Highlight tile under kitten when it wants attention or food"
-	)
-	default boolean highlightTile()
+	public static int getIconId(int npcId)
 	{
-		return true;
-	}
-
-	@Alpha
-	@ConfigItem(
-		keyName = "kittenHighlightColor",
-		name = "Highlight Color",
-		description = "Color of the Kitten highlight"
-	)
-	default Color getHighlightColor()
-	{
-		return Color.CYAN;
+		for (KittenID kittenID : KittenID.values())
+		{
+			if (kittenID.getId() == npcId)
+			{
+				return kittenID.iconId;
+			}
+		}
+		return 0;
 	}
 }

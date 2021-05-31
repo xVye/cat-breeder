@@ -22,45 +22,45 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.kittentimer;
+package com.kittentimer.followers;
 
-import java.awt.Color;
-import net.runelite.client.config.Alpha;
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
+import com.kittentimer.KittenMessage;
+import java.time.Duration;
+import java.time.Instant;
+import lombok.Getter;
+import net.runelite.api.NPC;
+import net.runelite.api.Player;
 
-@ConfigGroup("kittenTimer")
-public interface KittenTimerConfig extends Config
+public class Kitten
 {
-	@ConfigItem(
-		keyName = "kittenDisplayInteractionTimer",
-		name = "Display Interaction Timer",
-		description = "Toggle to show the interaction timer"
-	)
-	default boolean displayInteractionTimer()
+	@Getter
+	private final Player owner;
+
+
+	@Getter
+	private final Instant obtained;
+
+	@Getter
+	private final NPC npc;
+
+	@Getter
+	private final int id;
+
+	public Kitten(Player owner, NPC npc, Instant obtained)
 	{
-		return true;
+		this.owner = owner;
+		this.npc = npc;
+		this.obtained = obtained;
+		this.id = this.npc.getId();
 	}
 
-	@ConfigItem(
-		keyName = "kittenHighlightTile",
-		name = "Highlight Kitten Tile",
-		description = "Highlight tile under kitten when it wants attention or food"
-	)
-	default boolean highlightTile()
+	public String getExamineText()
 	{
-		return true;
+		return KittenMessage.NPC_EXAMINE + " <col=red>(" + getTimeLeft().toMinutes() + " minutes until grown.)</col>";
 	}
 
-	@Alpha
-	@ConfigItem(
-		keyName = "kittenHighlightColor",
-		name = "Highlight Color",
-		description = "Color of the Kitten highlight"
-	)
-	default Color getHighlightColor()
+	public Duration getTimeLeft()
 	{
-		return Color.CYAN;
+		return Duration.between(obtained, Instant.now());
 	}
 }
