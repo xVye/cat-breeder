@@ -36,7 +36,6 @@ public class Kitten
 	@Getter
 	private final Player owner;
 
-
 	@Getter
 	private final Instant obtained;
 
