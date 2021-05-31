@@ -111,6 +111,7 @@ public class KittenTimerPlugin extends Plugin
 			{
 				return;
 			}
+
 			Player localPlayer = client.getLocalPlayer();
 			if (localPlayer == null)
 			{
