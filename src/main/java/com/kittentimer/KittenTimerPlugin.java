@@ -29,10 +29,11 @@ import com.kittentimer.followers.Kitten;
 import com.kittentimer.overlays.KittenSceneOverlay;
 import com.kittentimer.utils.KittenID;
 import java.time.Instant;
-import java.util.Objects;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Actor;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -73,16 +74,14 @@ public class KittenTimerPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
-	private KittenSceneOverlay kittenSceneOverlay;
-
 	@Inject
 	private Client client;
 
 	@Getter
 	private Kitten currentKitten;
 
-	private boolean canNotify;
-	private boolean newKitten;
+	private KittenSceneOverlay kittenSceneOverlay;
+	private boolean shouldNotify;
 
 	@Provides
 	KittenTimerConfig provideConfig(ConfigManager configManager)
@@ -95,7 +94,7 @@ public class KittenTimerPlugin extends Plugin
 	{
 		kittenSceneOverlay = new KittenSceneOverlay(client, provideConfig(configManager), this);
 		overlayManager.add(kittenSceneOverlay); // TODO: Highlights Gertrude LOL! (Also no icon)
-		canNotify = true;
+		shouldNotify = true;
 		log.info(KittenTimerConfig.class.getName() + " startUp()");
 	}
 
@@ -103,7 +102,7 @@ public class KittenTimerPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		overlayManager.removeIf(t -> t instanceof KittenTimerConfig);
-		log.info(KittenTimerConfig.class.getName() + "shutDown()");
+		log.info(KittenTimerConfig.class.getName() + " shutDown()");
 	}
 
 	@Subscribe
@@ -112,7 +111,7 @@ public class KittenTimerPlugin extends Plugin
 		Widget playerDialog = client.getWidget(WidgetInfo.DIALOG_PLAYER);
 		Widget newKittenDialog = client.getWidget(229, 1);
 
-		if (newKitten || currentKitten == null)
+		if (currentKitten == null && playerDialog == null && newKittenDialog == null)
 		{
 			// TODO: Setup a new kitten
 			Player localPlayer = client.getLocalPlayer();
@@ -131,11 +130,10 @@ public class KittenTimerPlugin extends Plugin
 			{
 				return;
 			}
-
 			currentKitten = new Kitten(localPlayer, follower, Instant.now());
-			newKitten = false;
 		}
 
+		// TODO: Initiate using 'currentKitten = null' instead
 		if (newKittenDialog != null)
 		{
 			String newKittenDialogText = Text.removeTags(newKittenDialog.getText()).trim();
@@ -143,8 +141,6 @@ public class KittenTimerPlugin extends Plugin
 			{
 				return;
 			}
-
-			newKitten = true;
 			return;
 		}
 
@@ -164,37 +160,30 @@ public class KittenTimerPlugin extends Plugin
 
 			switch (dialogText)
 			{
-				case KittenMessage.CHAT_STROKE: // Message shows up empty - GAME_MESSAGE ok!
+				case KittenMessage.CHAT_STROKE:
 					// TODO: Count strokes & compare with time left
-					canNotify = false;
-					notifier.notify("You stroke your kitten.");
 					break;
-				case KittenMessage.CHAT_HUNGRY: // Message shows up empty - GAME_MESSAGE ok!
+				case KittenMessage.CHAT_HUNGRY:
 					// TODO: Display world overlay
-					canNotify = false;
-					notifier.notify("Your kitten is hungry!");
+					needAttention("Your kitten is hungry!");
 					break;
-				case KittenMessage.CHAT_REALLY_HUNGRY: // Message shows up empty - GAME_MESSAGE ok! (You kitten is very hungry.)
+				case KittenMessage.CHAT_REALLY_HUNGRY:
 					// TODO: Display world overlay (RED?)
-					canNotify = false;
-					notifier.notify("Your kitten is REALLY hungry!");
+					needAttention("Your kitten is REALLY hungry!");
 					break;
-				case KittenMessage.CHAT_ATTENTION: // Message shows up empty - GAME_MESSAGE ok!
+				case KittenMessage.CHAT_ATTENTION:
 					// TODO: Display world overlay
-					canNotify = false;
-					notifier.notify("Your kitten wants attention!");
+					needAttention("Your kitten wants attention!");
 					break;
 				case KittenMessage.CHAT_BALL_OF_WOOL:
 					// TODO: Update timer stuff
-					canNotify = false;
-					notifier.notify("Your kitten loves to play with that ball of wool.");
 					break;
 				case KittenMessage.CHAT_GROWN_UP:
-					if (canNotify)
+					if (shouldNotify)
 					{
 						notifier.notify("Your kitten has grown up to a healthy cat!");
 					}
-					canNotify = false;
+					shouldNotify = false;
 					break;
 				default:
 					log.info(dialogText);
@@ -206,43 +195,27 @@ public class KittenTimerPlugin extends Plugin
 	@Subscribe
 	public void onChatMessage(ChatMessage event)
 	{
-		if (!event.getType().equals(ChatMessageType.GAMEMESSAGE) && !event.getType().equals(ChatMessageType.NPC_EXAMINE))
-		{
-			return;
-		}
-
-		if (!hasFollower())
-		{
-			return;
-		}
-
-		if (getInteractingFollower() == null)
-		{
-			return;
-		}
-
 		String message = Text.removeTags(event.getMessage());
 		switch (message)
 		{
 			case KittenMessage.GAME_FEED:
 				// TODO: Timer stuff
+				log.info("FEEEEEEEED TIIIME!");
 				break;
 			case KittenMessage.GAME_RUN_AWAY:
+				log.info("KITTEN BUHUHUHUHUHUHU!");
 				if (currentKitten != null)
 				{
 					currentKitten = null;
 				}
 
-				if (canNotify)
+				if (shouldNotify)
 				{
 					notifier.notify(message);
 				}
+				shouldNotify = false;
 				break;
 			case KittenMessage.NPC_EXAMINE:
-				if (getInteractingFollower() == null)
-				{
-					currentKitten = null;
-				}
 				// currentKitten.getExamineText();
 				break;
 			default:
@@ -255,15 +228,22 @@ public class KittenTimerPlugin extends Plugin
 	{
 		if (event.getGameState() == GameState.LOGGED_IN)
 		{
-			if (currentKitten == null)
+			if (currentKitten != null)
 			{
-				NPC npcInteracting = (NPC) client.getLocalPlayer().getInteracting();
-				if (npcInteracting == null)
-				{
-					return;
-				}
-				currentKitten = new Kitten(client.getLocalPlayer(), npcInteracting, Instant.now());
+				return;
 			}
+
+			if (client.getLocalPlayer() == null)
+			{
+				return;
+			}
+
+			NPC npcInteracting = (NPC) client.getLocalPlayer().getInteracting();
+			if (npcInteracting == null)
+			{
+				return;
+			}
+			currentKitten = new Kitten(client.getLocalPlayer(), npcInteracting, Instant.now());
 		}
 	}
 
@@ -273,7 +253,7 @@ public class KittenTimerPlugin extends Plugin
 		int groupId = event.getGroupId();
 		if (groupId == WidgetInfo.DIALOG_PLAYER.getGroupId() || groupId == 229)
 		{
-			canNotify = true;
+			shouldNotify = true;
 		}
 	}
 
@@ -299,6 +279,35 @@ public class KittenTimerPlugin extends Plugin
 		}
 	}
 
+	private void needAttention(String notificationMessage)
+	{
+		if (!hasFollower())
+		{
+			return;
+		}
+
+		if (currentKitten == null)
+		{
+			return;
+		}
+		currentKitten.setOverlayActive(true);
+
+		if (shouldNotify)
+		{
+			notifier.notify(notificationMessage);
+			shouldNotify = false;
+		}
+	}
+
+	private void resetFollower()
+	{
+		if (currentKitten != null)
+		{
+			currentKitten.setOverlayActive(false);
+			currentKitten = null;
+		}
+	}
+
 	private boolean hasFollower()
 	{
 		int varFollower = client.getVarpValue(KittenVarPlayer.FOLLOWER.getId());
@@ -312,8 +321,9 @@ public class KittenTimerPlugin extends Plugin
 		{
 			return null;
 		}
+
 		NPC npcKitten = (NPC) localPlayer.getInteracting();
-		if (!KittenID.contains(npcKitten.getId()))
+		if (npcKitten == null || !KittenID.contains(npcKitten.getId()))
 		{
 			return null;
 		}

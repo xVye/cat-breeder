@@ -65,17 +65,17 @@ public class KittenSceneOverlay extends Overlay
 	}
 
 	@Override
-	public Dimension render(Graphics2D graphics)
+	public Dimension render(Graphics2D g)
 	{
 		Kitten kitten = plugin.getCurrentKitten();
-		if (kitten != null)
+		if (kitten != null && kitten.isOverlayActive())
 		{
-			renderNpcOverlay(graphics, kitten.getNpc(), config.getHighlightColor());
+			renderNpcOverlay(g, kitten.getNpc(), config.getHighlightColor());
 		}
 		return null;
 	}
 
-	private void renderNpcOverlay(Graphics2D graphics, NPC actor, Color color)
+	private void renderNpcOverlay(Graphics2D g, NPC actor, Color color)
 	{
 		NPCComposition npcComposition = actor.getTransformedComposition();
 		if (npcComposition == null || !npcComposition.isInteractible() || actor.isDead())
@@ -88,24 +88,31 @@ public class KittenSceneOverlay extends Overlay
 			int size = npcComposition.getSize();
 			LocalPoint localPoint = actor.getLocalLocation();
 			Polygon tilePoly = Perspective.getCanvasTileAreaPoly(client, localPoint, size);
-			renderPoly(graphics, color, tilePoly);
-			renderIcon(actor, localPoint, graphics);
+			renderPoly(g, color, tilePoly);
+			renderIcon(actor, localPoint, g);
 		}
 	}
 
-	private void renderPoly(Graphics2D graphics, Color color, Shape polygon)
+	private void renderPoly(Graphics2D g, Color color, Shape polygon)
 	{
 		if (polygon != null)
 		{
-			graphics.setColor(color);
-			graphics.setStroke(new BasicStroke(2));
-			graphics.draw(polygon);
-			graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 20));
-			graphics.fill(polygon);
+			g.setColor(color);
+			g.setStroke(new BasicStroke(2));
+			g.draw(polygon);
+			g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 20));
+			g.fill(polygon);
+
+			BufferedImage image = plugin.getItemManager().getImage(KittenID.getIconId(plugin.getCurrentKitten().getId()));
+			g.drawImage(
+				image,
+				(int) polygon.getBounds2D().getCenterX() - image.getWidth() / 2,
+				(int) polygon.getBounds2D().getCenterY() - image.getHeight(),
+				null);
 		}
 	}
 
-	private void renderIcon(final NPC npc, final LocalPoint localPoint, final Graphics2D graphics)
+	private void renderIcon(final NPC npc, final LocalPoint localPoint, final Graphics2D g)
 	{
 		if (localPoint == null || npc.getTransformedComposition() == null)
 		{
@@ -127,6 +134,6 @@ public class KittenSceneOverlay extends Overlay
 		}
 
 		final BufferedImage image = plugin.getItemManager().getImage(kittenIconId);
-		OverlayUtil.renderActorOverlayImage(graphics, npc, image, Color.RED.brighter(), -ICON_OFFSET_Z);
+		//OverlayUtil.renderActorOverlayImage(g, npc, image, Color.RED.brighter(), -ICON_OFFSET_Z);
 	}
 }

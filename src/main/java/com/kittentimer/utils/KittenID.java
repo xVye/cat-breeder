@@ -37,15 +37,15 @@ import net.runelite.api.NpcID;
 @Getter
 public enum KittenID
 {
-	KITTEN_2(ItemID.PET_KITTEN, NpcID.KITTEN_5591),
-	KITTEN_3(ItemID.PET_KITTEN_1556, NpcID.KITTEN_5592),
-	KITTEN_4(ItemID.PET_KITTEN_1557, NpcID.KITTEN_5593),
-	KITTEN_5(ItemID.PET_KITTEN_1558, NpcID.KITTEN_5594),
-	KITTEN_6(ItemID.PET_KITTEN_1559, NpcID.KITTEN_5595),
-	KITTEN_7(ItemID.PET_KITTEN_1560, NpcID.KITTEN_5596),
+	KITTEN_5591(ItemID.PET_KITTEN, NpcID.KITTEN_5591),
+	KITTEN_5592(ItemID.PET_KITTEN_1556, NpcID.KITTEN_5592),
+	KITTEN_5593(ItemID.PET_KITTEN_1557, NpcID.KITTEN_5593),
+	KITTEN_5594(ItemID.PET_KITTEN_1558, NpcID.KITTEN_5594),
+	KITTEN_5595(ItemID.PET_KITTEN_1559, NpcID.KITTEN_5595),
+	KITTEN_5596(ItemID.PET_KITTEN_1560, NpcID.KITTEN_5596),
 	HELLKITTEN(ItemID.HELLKITTEN, NpcID.HELLKITTEN);
 
-	private static final Map<Integer, Integer> kittens = new HashMap<>();
+	private static final Map<Integer, Integer> kittenIDs = new HashMap<>();
 	private final int iconId;
 	private final int id;
 
@@ -53,26 +53,24 @@ public enum KittenID
 	{
 		for (KittenID kittenID : values())
 		{
-			kittens.put(kittenID.getIconId(), kittenID.getId());
+			kittenIDs.put(kittenID.getIconId(), kittenID.getId());
 		}
 	}
 
 	public static boolean contains(int npcId)
 	{
-		return kittens.containsValue(npcId);
+		return kittenIDs.containsValue(npcId);
 	}
 
 	public static int getIconId(int npcId)
 	{
-		for (Map.Entry<Integer, Integer> kittenID : kittens.entrySet())
+		for (Map.Entry<Integer, Integer> kittenID : kittenIDs.entrySet())
 		{
 			if (kittenID.getValue().equals(npcId))
 			{
-				log.info("KittenID.getIconId: NpcID(" + kittenID.getValue() + ") - IconID(" + kittenID.getKey() + ")");
 				return kittenID.getKey();
 			}
 		}
-		log.info("KittenID.getIconId: no match.");
 		return 0;
 	}
 }

@@ -27,7 +27,10 @@ package com.kittentimer.followers;
 import com.kittentimer.KittenMessage;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 
@@ -44,6 +47,10 @@ public class Kitten
 
 	@Getter
 	private final int id;
+
+	@Getter
+	@Setter
+	private boolean overlayActive;
 
 	public Kitten(Player owner, NPC npc, Instant obtained)
 	{

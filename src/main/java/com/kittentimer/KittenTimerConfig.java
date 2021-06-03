@@ -61,6 +61,6 @@ public interface KittenTimerConfig extends Config
 	)
 	default Color getHighlightColor()
 	{
-		return Color.CYAN;
+		return Color.RED.brighter();
 	}
 }
